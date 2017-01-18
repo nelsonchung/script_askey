@@ -4,19 +4,24 @@ PASSWD="123456"
 IPADDR="10.194.22.102"
 REMOTE_PATH="VirtualBox/redmin-12"
 BACKUP_FOLDER="backup_folder"
-FOLDERNAME=`date +"%Y%m%d"`
-ZIPFILENAME=$FOLDERNAME".7z"
+FTP_DL_FOLDERNAME=$IPADDR
 HOUR_RUN_BACKUP=01
 MINUTE_RUN_BACKUP=00
 
 #################Function###########################
 function Backup(){
+
+    #update the parameter again
+    FOLDERNAME=`date +"%Y%m%d"`
+    ZIPFILENAME=$FOLDERNAME".7z"
+    
     #move backup file to backup folder
     mkdir -p $BACKUP_FOLDER
     mv *.7z $BACKUP_FOLDER
 
     #wget -r ftp://askey:123456@10.194.22.102/VirtualBox/redmin-12/
-    wget -r "ftp://$ACCOUNT:$PASSWD@$IPADDR/$REMOTE_PATH/" -O $FOLDERNAME
+    wget -r "ftp://$ACCOUNT:$PASSWD@$IPADDR/$REMOTE_PATH/"
+    mv $FTP_DL_FOLDERNAME $FOLDERNAME
     #compress
     7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
     #remove backup folder
