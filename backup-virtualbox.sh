@@ -1,7 +1,7 @@
 #################Configuration#######################
 ACCOUNT="askey"
 PASSWD="123456"
-IPADDR="10.194.22.102"
+IPADDR="10.194.20.35"
 REMOTE_PATH="VirtualBox/redmin-12"
 BACKUP_FOLDER="backup_folder"
 FTP_DL_FOLDERNAME=$IPADDR
@@ -25,10 +25,13 @@ function Backup(){
     #compress
     7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
     #remove backup folder
-    rm -rf $FOLDERNAME
+    7z_ret=$?
+    if [ $7z_ret -eq 0 ]; then
+        #remove old data
+        rm -rf $FOLDERNAME
+        rm -rf $BACKUP_FOLDER
+    fi
 
-    #remove old data
-    rm -rf $BACKUP_FOLDER
     sync
 }
 
