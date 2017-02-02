@@ -7,7 +7,7 @@ BACKUP_FOLDER="backup_folder"
 FTP_DL_FOLDERNAME=$IPADDR
 HOUR_RUN_BACKUP=01
 MINUTE_RUN_BACKUP=00
-BACKUP_FILE_NUM=5
+BACKUP_FILE_NUM=3
 
 #################Function###########################
 function Backup(){
@@ -42,6 +42,9 @@ function Backup(){
             mkdir -p $BACKUP_FOLDER
             mv *.7z $BACKUP_FOLDER
         fi
+        sendmail -vt  < ok__backup.txt
+    else
+        sendmail -vt < fail_backup.txt
     fi
     sync
 }

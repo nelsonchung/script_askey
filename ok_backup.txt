@@ -1,0 +1,6 @@
+To: nelson_chung@askey.com.tw
+Subject: Redmine & Git 備份成功
+From: askey_db50_reminder@askey.com.tw
+
+Redmine & Git 備份成功
+

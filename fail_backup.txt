@@ -1,0 +1,6 @@
+To: nelson_chung@askey.com.tw
+Subject: Redmine & Git 備份 FAIL ******
+From: askey_db50_reminder@askey.com.tw
+
+Redmine & Git 備份 FAIL ******
+
