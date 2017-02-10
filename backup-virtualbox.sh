@@ -9,7 +9,7 @@ BACKUP_FOLDER="backup_folder"
 FTP_DL_FOLDERNAME=$IPADDR
 HOUR_RUN_BACKUP=22
 MINUTE_RUN_BACKUP=00
-BACKUP_FILE_NUM=3
+BACKUP_FILE_NUM=2
 
 #################Function###########################
 function Backup(){
@@ -21,6 +21,7 @@ function Backup(){
     
     #wget -r ftp://askey:123456@10.194.22.102/VirtualBox/redmin-12/
     wget -r "ftp://$ACCOUNT:$PASSWD@$IPADDR/$REMOTE_PATH/"
+    echo "mv $FTP_DL_FOLDERNAME $FOLDERNAME"
     mv $FTP_DL_FOLDERNAME $FOLDERNAME
     
     #compress
