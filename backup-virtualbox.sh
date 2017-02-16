@@ -10,6 +10,9 @@ FTP_DL_FOLDERNAME=$IPADDR
 HOUR_RUN_BACKUP=22
 MINUTE_RUN_BACKUP=00
 BACKUP_FILE_NUM=2
+BACKUP_SERVER_IP_ADDR="10.194.8.32"
+FTP_ACCOUNT="askey"
+FTP_PASSWD="123456"
 
 #################Function###########################
 function Backup(){
@@ -45,6 +48,7 @@ function Backup(){
             mkdir -p $BACKUP_FOLDER
             mv *.$FILENAMEEXTENSION $BACKUP_FOLDER
         fi
+        SyncToBackupServer $ZIPFILENAME
         sendmail -vt  < ok_backup.txt
     else
         sendmail -vt < fail_backup.txt
@@ -52,6 +56,14 @@ function Backup(){
     sync
 }
 
+function SyncToBakcupServer(){
+  ftp -n $BACKUP_SERVER_IP_ADDR
+  user $FTP_ACCOUNT $FTP_PASSWD
+  binary
+  put $1 
+  bye
+  EOC
+}
 #################Start##############################
 
 
