@@ -56,7 +56,7 @@ function Backup(){
     sync
 }
 
-function SyncToBakcupServer(){
+function SyncToBackupServer(){
   ftp -n $BACKUP_SERVER_IP_ADDR
   user $FTP_ACCOUNT $FTP_PASSWD
   binary
