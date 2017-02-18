@@ -30,6 +30,7 @@ function Backup(){
     #compress
     #7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
     tar zcvf $ZIPFILENAME $FOLDERNAME 
+    SyncToBackupServer $ZIPFILENAME
     ret_comparess=$?
     if [ $ret_comparess -eq 0 ]; then
     #if [ "$ret_comparess" == "0" ]; then #it is ok too
@@ -48,7 +49,6 @@ function Backup(){
             mkdir -p $BACKUP_FOLDER
             mv *.$FILENAMEEXTENSION $BACKUP_FOLDER
         fi
-        SyncToBackupServer $ZIPFILENAME
         sendmail -vt  < ok_backup.txt
     else
         sendmail -vt < fail_backup.txt
