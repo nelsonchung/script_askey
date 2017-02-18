@@ -7,8 +7,8 @@ REMOTE_PATH="VirtualBox/redmin-12"
 #REMOTE_PATH="VirtualBox/redmin-12/Logs"
 BACKUP_FOLDER="backup_folder"
 FTP_DL_FOLDERNAME=$IPADDR
-HOUR_RUN_BACKUP=22
-MINUTE_RUN_BACKUP=00
+HOUR_RUN_BACKUP=00
+MINUTE_RUN_BACKUP=05
 BACKUP_FILE_NUM=2
 BACKUP_SERVER_IP_ADDR="10.194.8.32"
 FTP_ACCOUNT="askey"
@@ -30,7 +30,7 @@ function Backup(){
     #compress
     #7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
     tar zcvf $ZIPFILENAME $FOLDERNAME 
-    SyncToBackupServer $ZIPFILENAME
+    SyncToBackupServer_wput $ZIPFILENAME
     ret_comparess=$?
     if [ $ret_comparess -eq 0 ]; then
     #if [ "$ret_comparess" == "0" ]; then #it is ok too
@@ -56,13 +56,24 @@ function Backup(){
     sync
 }
 
+function SyncToBackupServer_wput(){
+    #wput test.txt ftp://askey:123456@10.194.8.32/
+    wput $1 ftp://$FTP_ACCOUNT:$FTP_PASSWD@$BACKUP_SERVER_IP_ADDR/
+}
 function SyncToBackupServer(){
-  ftp -n $BACKUP_SERVER_IP_ADDR
-  user $FTP_ACCOUNT $FTP_PASSWD
-  binary
-  put $1 
-  bye
-  EOC
+  #ftp -n $BACKUP_SERVER_IP_ADDR
+  #user $FTP_ACCOUNT $FTP_PASSWD
+  #binary
+  #put $1 
+  #bye
+  #EOC
+ftp -n <<END
+open $BACKUP_SERVER_IP_ADDR
+user $FTP_ACCOUNT $FTP_PASSWD
+binary
+put $1 
+bye
+END
 }
 #################Start##############################
 
