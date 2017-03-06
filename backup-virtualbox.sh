@@ -7,16 +7,21 @@ REMOTE_PATH="VirtualBox/redmin-12"
 #REMOTE_PATH="VirtualBox/redmin-12/Logs"
 BACKUP_FOLDER="backup_folder"
 FTP_DL_FOLDERNAME=$IPADDR
-HOUR_RUN_BACKUP=22
+HOUR_RUN_BACKUP=00
 MINUTE_RUN_BACKUP=00
-BACKUP_FILE_NUM=2
+BACKUP_FILE_NUM=1
+BACKUP_SERVER_IP_ADDR="10.194.8.32"
+FTP_ACCOUNT="askey"
+FTP_PASSWD="123456"
+REMOVE_FOLDER_AFTER_COMPRESS_DONE="1"
 
 #################Function###########################
 function Backup(){
 
     #update the parameter again
     FOLDERNAME=`date +"%Y%m%d"`
-    FILENAMEEXTENSION="tar.gz"
+    FILENAMEEXTENSION="7z"
+    #FILENAMEEXTENSION="tar.gz"
     ZIPFILENAME=$FOLDERNAME"."$FILENAMEEXTENSION
     
     #wget -r ftp://askey:123456@10.194.22.102/VirtualBox/redmin-12/
@@ -25,14 +30,29 @@ function Backup(){
     mv $FTP_DL_FOLDERNAME $FOLDERNAME
     
     #compress
-    #7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
-    tar zcvf $ZIPFILENAME $FOLDERNAME 
+    7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
+    #tar zcvf $ZIPFILENAME $FOLDERNAME 
     ret_comparess=$?
+    sync
+    #remove directly because the disk size is not enough.
+    if [ $REMOVE_FOLDER_AFTER_COMPRESS_DONE == "1" ]; then
+        echo "remove $FOLDERNAME directly"
+        rm -rf $FOLDERNAME
+    fi
+
+    #backup to another server
+    #SyncToBackupServer_wput $ZIPFILENAME
+    #ret_comparess=$?
+
     if [ $ret_comparess -eq 0 ]; then
     #if [ "$ret_comparess" == "0" ]; then #it is ok too
-        #move folder to backup folder first
-        mv $FOLDERNAME $BACKUP_FOLDER
+        if [ $REMOVE_FOLDER_AFTER_COMPRESS_DONE != "1" ]; then
+            #move folder to backup folder first
+            mv $FOLDERNAME $BACKUP_FOLDER
+        fi
 
+        #上傳server的頻寬太慢(900K/s),導致備份一次要21個小時
+        #所以,我們先取消這邊的機制。 
         backup_file_number=`ls *.$FILENAMEEXTENSION | wc | awk -F ' ' '{print $1}'`
         #echo $backup_file_number
         if [ $backup_file_number -ge $BACKUP_FILE_NUM ]; then
@@ -49,9 +69,32 @@ function Backup(){
     else
         sendmail -vt < fail_backup.txt
     fi
-    sync
+
+
+    #If we backup the file to backup server, we need to rm $ZIPFILENAME here.
+    #rm $ZIPFILENAME
+    #sync
 }
 
+function SyncToBackupServer_wput(){
+    #wput test.txt ftp://askey:123456@10.194.8.32/
+    wput $1 ftp://$FTP_ACCOUNT:$FTP_PASSWD@$BACKUP_SERVER_IP_ADDR/
+}
+function SyncToBackupServer(){
+  #ftp -n $BACKUP_SERVER_IP_ADDR
+  #user $FTP_ACCOUNT $FTP_PASSWD
+  #binary
+  #put $1 
+  #bye
+  #EOC
+ftp -n <<END
+open $BACKUP_SERVER_IP_ADDR
+user $FTP_ACCOUNT $FTP_PASSWD
+binary
+put $1 
+bye
+END
+}
 #################Start##############################
 
 
