@@ -14,10 +14,22 @@ BACKUP_SERVER_IP_ADDR="10.194.8.32"
 FTP_ACCOUNT="askey"
 FTP_PASSWD="123456"
 REMOVE_FOLDER_AFTER_COMPRESS_DONE="1"
+ADDITIONAL_FILE="moreinfo.txt"
+RESULT_FILE="result.txt"
+BACKUP_RESULT=0
 
 #################Function###########################
-function Backup(){
+function Initial(){
+    rm $ADDITIONAL_FILE
+    rm $RESULT_FILE
+}
 
+function Backup(){
+    
+    Initial
+    echo "Start to backup system" >> $ADDITIONAL_FILE
+    date >> $ADDITIONAL_FILE
+    
     #update the parameter again
     FOLDERNAME=`date +"%Y%m%d"`
     FILENAMEEXTENSION="7z"
@@ -28,12 +40,21 @@ function Backup(){
     wget -r "ftp://$ACCOUNT:$PASSWD@$IPADDR/$REMOTE_PATH/"
     echo "mv $FTP_DL_FOLDERNAME $FOLDERNAME"
     mv $FTP_DL_FOLDERNAME $FOLDERNAME
+
+    #output information
+    echo "The size of $FOLDERNAME is " >> $ADDITIONAL_FILE
+    du -sh $FOLDERNAME >> $ADDITIONAL_FILE
     
     #compress
     7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
     #tar zcvf $ZIPFILENAME $FOLDERNAME 
     ret_comparess=$?
     sync
+
+    #output information
+    echo "The size of $ZIPFILENAME is " >> $ADDITIONAL_FILE
+    ls -alht $ZIPFILENAME >> $ADDITIONAL_FILE
+
     #remove directly because the disk size is not enough.
     if [ $REMOVE_FOLDER_AFTER_COMPRESS_DONE == "1" ]; then
         echo "remove $FOLDERNAME directly"
@@ -65,11 +86,22 @@ function Backup(){
             mkdir -p $BACKUP_FOLDER
             mv *.$FILENAMEEXTENSION $BACKUP_FOLDER
         fi
-        sendmail -vt  < ok_backup.txt
+        $BACKUP_RESULT=1
     else
-        sendmail -vt < fail_backup.txt
+        $BACKUP_RESULT=0
     fi
 
+    echo "End to backup system" >> $ADDITIONAL_FILE
+    date >> $ADDITIONAL_FILE
+
+    if [ $BACKUP_RESULT -eq 1 ]; then
+        cat ok_backup.txt >> $RESULT_FILE
+        cat $ADDITIONAL_FILE >> $RESULT_FILE
+    else
+        cat fail_backup.txt >> $RESULT_FILE
+        cat $ADDITIONAL_FILE >> $RESULT_FILE
+    fi
+    sendmail -vt  < $RESULT_FILE
 
     #If we backup the file to backup server, we need to rm $ZIPFILENAME here.
     #rm $ZIPFILENAME
@@ -109,9 +141,8 @@ do
 
     if [ "$HOUR" == "$HOUR_RUN_BACKUP" ] && [ "$MINUTE" == "$MINUTE_RUN_BACKUP" ]; then
         echo "Start to backup system"
-        date
         Backup
-        date
+        echo "End to backup system"
     fi
     sleep 60
 done
