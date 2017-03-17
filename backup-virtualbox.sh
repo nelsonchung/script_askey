@@ -17,11 +17,14 @@ REMOVE_FOLDER_AFTER_COMPRESS_DONE="1"
 ADDITIONAL_FILE="moreinfo.txt"
 RESULT_FILE="result.txt"
 BACKUP_RESULT=0
+#COMPRESS_MECHANISM="7Z"
+COMPRESS_MECHANISM="TAR"
 
 #################Function###########################
 function Initial(){
     rm $ADDITIONAL_FILE
     rm $RESULT_FILE
+    BACKUP_RESULT=0
 }
 
 function Backup(){
@@ -32,8 +35,11 @@ function Backup(){
     
     #update the parameter again
     FOLDERNAME=`date +"%Y%m%d"`
-    FILENAMEEXTENSION="7z"
-    #FILENAMEEXTENSION="tar.gz"
+    if [ $COMPRESS_MECHANISM == "7Z" ] ;then
+        FILENAMEEXTENSION="7z"
+    elif [ $COMPRESS_MECHANISM == "TAR" ] ;then
+        FILENAMEEXTENSION="tar.gz"
+    fi
     ZIPFILENAME=$FOLDERNAME"."$FILENAMEEXTENSION
     
     #wget -r ftp://askey:123456@10.194.22.102/VirtualBox/redmin-12/
@@ -46,8 +52,11 @@ function Backup(){
     du -sh $FOLDERNAME >> $ADDITIONAL_FILE
     
     #compress
-    7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
-    #tar zcvf $ZIPFILENAME $FOLDERNAME 
+    if [ $COMPRESS_MECHANISM == "7Z" ] ;then
+        7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on $ZIPFILENAME $FOLDERNAME
+    elif [ $COMPRESS_MECHANISM == "TAR" ] ;then
+        tar zcvf $ZIPFILENAME $FOLDERNAME 
+    fi
     ret_comparess=$?
     sync
 
@@ -86,9 +95,9 @@ function Backup(){
             mkdir -p $BACKUP_FOLDER
             mv *.$FILENAMEEXTENSION $BACKUP_FOLDER
         fi
-        $BACKUP_RESULT=1
+        BACKUP_RESULT=1
     else
-        $BACKUP_RESULT=0
+        BACKUP_RESULT=0
     fi
 
     echo "End to backup system" >> $ADDITIONAL_FILE
