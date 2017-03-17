@@ -32,6 +32,7 @@ function Backup(){
     Initial
     echo "Start to backup system" >> $ADDITIONAL_FILE
     date >> $ADDITIONAL_FILE
+    echo "" >> $ADDITIONAL_FILE
     
     #update the parameter again
     FOLDERNAME=`date +"%Y%m%d"`
@@ -50,6 +51,7 @@ function Backup(){
     #output information
     echo "The size of $FOLDERNAME is " >> $ADDITIONAL_FILE
     du -sh $FOLDERNAME >> $ADDITIONAL_FILE
+    echo "" >> $ADDITIONAL_FILE
     
     #compress
     if [ $COMPRESS_MECHANISM == "7Z" ] ;then
@@ -63,6 +65,7 @@ function Backup(){
     #output information
     echo "The size of $ZIPFILENAME is " >> $ADDITIONAL_FILE
     ls -alht $ZIPFILENAME >> $ADDITIONAL_FILE
+    echo "" >> $ADDITIONAL_FILE
 
     #remove directly because the disk size is not enough.
     if [ $REMOVE_FOLDER_AFTER_COMPRESS_DONE == "1" ]; then
@@ -102,6 +105,7 @@ function Backup(){
 
     echo "End to backup system" >> $ADDITIONAL_FILE
     date >> $ADDITIONAL_FILE
+    echo "" >> $ADDITIONAL_FILE
 
     if [ $BACKUP_RESULT -eq 1 ]; then
         cat ok_backup.txt >> $RESULT_FILE
