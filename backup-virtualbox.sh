@@ -9,7 +9,7 @@ BACKUP_FOLDER="bk_folder"
 FTP_DL_FOLDERNAME=$IPADDR
 HOUR_RUN_BACKUP=00
 MINUTE_RUN_BACKUP=00
-BACKUP_FILE_NUM=14
+BACKUP_FILE_NUM=7
 BACKUP_SERVER_IP_ADDR="10.194.8.32"
 FTP_ACCOUNT="askey"
 FTP_PASSWD="123456"
@@ -86,7 +86,7 @@ function Backup(){
 
         #上傳server的頻寬太慢(900K/s),導致備份一次要21個小時
         #所以,我們先取消這邊的機制。 
-        backup_file_number=`ls *.$FILENAMEEXTENSION | wc | awk -F ' ' '{print $1}'`
+        backup_file_number=`ls *.$FILENAMEEXTENSION | wc -l`
         #echo $backup_file_number
         if [ $backup_file_number -ge $BACKUP_FILE_NUM ]; then
             echo "$backup_file_number >= $BACKUP_FILE_NUM"
