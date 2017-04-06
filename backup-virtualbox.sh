@@ -84,20 +84,9 @@ function Backup(){
             mv $FOLDERNAME $BACKUP_FOLDER
         fi
 
-        #上傳server的頻寬太慢(900K/s),導致備份一次要21個小時
-        #所以,我們先取消這邊的機制。 
-        backup_file_number=`ls *.$FILENAMEEXTENSION | wc -l`
-        #echo $backup_file_number
-        if [ $backup_file_number -ge $BACKUP_FILE_NUM ]; then
-            echo "$backup_file_number >= $BACKUP_FILE_NUM"
-            #remove old data
-            echo "Delete old information - $BACKUP_FOLDER"
-            rm -rf $BACKUP_FOLDER
+        mv $ZIPFILENAME $BACKUP_FOLDER
+        find $BACKUP_FOLDER -type f -mtime +$BACKUP_FILE_NUM -exec rm '{}' \;
 
-            #move backup file to backup folder
-            mkdir -p $BACKUP_FOLDER
-            mv *.$FILENAMEEXTENSION $BACKUP_FOLDER
-        fi
         BACKUP_RESULT=1
     else
         BACKUP_RESULT=0
