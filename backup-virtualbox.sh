@@ -9,7 +9,7 @@ BACKUP_FOLDER="bk_folder"
 FTP_DL_FOLDERNAME=$IPADDR
 HOUR_RUN_BACKUP=00
 MINUTE_RUN_BACKUP=00
-BACKUP_FILE_NUM=7
+BACKUP_FILE_NUM=6
 BACKUP_SERVER_IP_ADDR="10.194.8.32"
 FTP_ACCOUNT="askey"
 FTP_PASSWD="123456"
@@ -131,6 +131,8 @@ END
 }
 #################Start##############################
 
+#Create $BACKUP_FOLDER first
+mkdir -p $BACKUP_FOLDER
 
 while [ 1 ]
 do
